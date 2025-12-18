@@ -92,6 +92,12 @@ func buildCommandOptions(options *Options) *cli.CommandOptions {
 		PermissionPromptToolName:        options.PermissionPromptToolName,
 	}
 
+	// When CanUseTool callback is set, tell CLI to send permission prompts via stdio
+	if options.CanUseTool != nil && options.PermissionPromptToolName == nil {
+		stdio := "stdio"
+		cmdOpts.PermissionPromptToolName = &stdio
+	}
+
 	if options.SystemPrompt != nil {
 		if options.SystemPrompt.Prompt != "" {
 			cmdOpts.SystemPrompt = &options.SystemPrompt.Prompt

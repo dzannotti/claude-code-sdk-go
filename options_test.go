@@ -299,3 +299,37 @@ func TestMultipleOptions(t *testing.T) {
 		t.Error("include partial messages not set correctly")
 	}
 }
+
+func TestBuildCommandOptions_CanUseTool_SetsStdio(t *testing.T) {
+	fn := func(ctx context.Context, toolName string, input map[string]any, opts control.CanUseToolOptions) (control.PermissionResult, error) {
+		return control.PermissionResult{Behavior: control.PermissionAllow}, nil
+	}
+	opts := applyOptions([]Option{WithCanUseTool(fn)})
+	cmdOpts := buildCommandOptions(opts)
+
+	if cmdOpts.PermissionPromptToolName == nil {
+		t.Fatal("expected PermissionPromptToolName to be set when CanUseTool is provided")
+	}
+	if *cmdOpts.PermissionPromptToolName != "stdio" {
+		t.Errorf("expected PermissionPromptToolName to be 'stdio', got %q", *cmdOpts.PermissionPromptToolName)
+	}
+}
+
+func TestBuildCommandOptions_CanUseTool_DoesNotOverrideExplicitTool(t *testing.T) {
+	fn := func(ctx context.Context, toolName string, input map[string]any, opts control.CanUseToolOptions) (control.PermissionResult, error) {
+		return control.PermissionResult{Behavior: control.PermissionAllow}, nil
+	}
+	explicitTool := "custom-tool"
+	opts := applyOptions([]Option{
+		WithCanUseTool(fn),
+		WithPermissionPromptToolName(explicitTool),
+	})
+	cmdOpts := buildCommandOptions(opts)
+
+	if cmdOpts.PermissionPromptToolName == nil {
+		t.Fatal("expected PermissionPromptToolName to be set")
+	}
+	if *cmdOpts.PermissionPromptToolName != "custom-tool" {
+		t.Errorf("expected PermissionPromptToolName to be 'custom-tool', got %q", *cmdOpts.PermissionPromptToolName)
+	}
+}
