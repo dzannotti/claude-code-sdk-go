@@ -192,6 +192,34 @@ err := claudecode.WithClient(ctx, func(c claudecode.Client) error {
 })
 ```
 
+## Session History
+
+Load conversation history from previous sessions:
+
+```go
+import "claudecode/session"
+
+// Find project directory for current working directory
+projectDir, _ := session.ProjectDir(".")
+
+// List available sessions
+sessions, _ := session.ListSessions(projectDir)
+for _, s := range sessions {
+    fmt.Printf("%s - %s\n", s.ID, s.ModTime)
+}
+
+// Load messages from a session
+msgs, _ := session.LoadByID(projectDir, sessionID)
+for _, msg := range msgs {
+    // Display previous messages in your UI
+}
+
+// Resume the session
+iter, _ := claudecode.Query(ctx, "continue",
+    claudecode.WithResume(sessionID),
+)
+```
+
 ## Examples
 
 See the [`examples/`](./examples) directory:
@@ -199,6 +227,7 @@ See the [`examples/`](./examples) directory:
 - `01_quickstart/` - Basic Query API usage
 - `02_client_streaming/` - Streaming with Client API
 - `03_client_multi_turn/` - Multi-turn conversations
+- `04_session_resume/` - Load history and resume sessions
 - `08_client_advanced/` - Advanced client features
 - `10_context_manager/` - Context and cancellation
 - `interactive_chat/` - Full interactive chat with tools
