@@ -6,6 +6,12 @@
 *.dylib
 /interactive_chat
 /slash_commands
+/01_quickstart
+/02_client_streaming
+/03_client_multi_turn
+/04_session_resume
+/08_client_advanced
+/10_context_manager
 
 # Test binaries
 *.test
