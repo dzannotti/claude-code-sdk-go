@@ -1,0 +1,82 @@
+version: "2"
+
+run:
+  timeout: 5m
+  concurrency: 8
+
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - revive
+    - staticcheck
+    - unused
+    - gocyclo
+    - misspell
+    - dupl
+    - unconvert
+    - nakedret
+    - nilerr
+    - testifylint
+    - prealloc
+    - recvcheck
+
+  settings:
+    gocyclo:
+      min-complexity: 15
+    revive:
+      rules:
+        - name: unused-parameter
+          disabled: true
+        - name: package-comments
+          disabled: true
+    staticcheck:
+      checks:
+        - all
+        - -QF1003
+
+  exclusions:
+    generated: strict
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - path: '_test\.go'
+        linters:
+          - errcheck
+          - gocyclo
+          - dupl
+      - path: 'examples/'
+        linters:
+          - gocyclo
+      - path: 'internal/cli/command\.go'
+        linters:
+          - gocyclo
+      - path: 'internal/transport/subprocess\.go'
+        linters:
+          - gocyclo
+      - path: 'message/unmarshal\.go'
+        linters:
+          - gocyclo
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+  settings:
+    goimports:
+      local-prefixes:
+        - claudecode
+
+  exclusions:
+    generated: strict
+
+output:
+  formats:
+    text:
+      path: stdout
