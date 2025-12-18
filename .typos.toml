@@ -1,0 +1,18 @@
+[default]
+extend-ignore-re = [
+    # Git SHAs
+    "[0-9a-f]{7,40}",
+]
+
+[files]
+extend-exclude = [
+    "*.lock",
+    "*.sum",
+    "go.mod",
+    "go.sum",
+    "vendor/",
+    "bin/",
+    ".git/",
+    "coverage.out",
+    "coverage.html",
+]
