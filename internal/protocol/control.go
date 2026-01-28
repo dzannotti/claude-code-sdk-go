@@ -290,8 +290,7 @@ func (h *ControlHandler) handleHookCallback(ctx context.Context, reqData map[str
 	}
 
 	inputData, _ := json.Marshal(reqData["input"])
-	var hookInput control.HookInput
-	_ = json.Unmarshal(inputData, &hookInput) // best effort conversion
+	hookInput := parseHookInput(inputData)
 
 	output, err := fn(ctx, hookInput, toolUseID)
 	if err != nil {
@@ -300,9 +299,75 @@ func (h *ControlHandler) handleHookCallback(ctx context.Context, reqData map[str
 
 	resp := make(map[string]any)
 	data, _ := json.Marshal(output)
-	_ = json.Unmarshal(data, &resp) // always succeeds for map[string]any
+	_ = json.Unmarshal(data, &resp)
 
 	return resp, nil
+}
+
+func parseHookInput(data []byte) control.HookInput {
+	var eventName struct {
+		HookEventName string `json:"hook_event_name"`
+	}
+	if err := json.Unmarshal(data, &eventName); err != nil {
+		return nil
+	}
+
+	switch control.HookEvent(eventName.HookEventName) {
+	case control.HookPreToolUse:
+		var input control.PreToolUseHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookPostToolUse:
+		var input control.PostToolUseHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookPostToolUseFailure:
+		var input control.PostToolUseFailureHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookNotification:
+		var input control.NotificationHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookUserPromptSubmit:
+		var input control.UserPromptSubmitHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookSessionStart:
+		var input control.SessionStartHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookSessionEnd:
+		var input control.SessionEndHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookStop:
+		var input control.StopHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookSubagentStart:
+		var input control.SubagentStartHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookSubagentStop:
+		var input control.SubagentStopHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookPreCompact:
+		var input control.PreCompactHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookPermissionRequest:
+		var input control.PermissionRequestHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	case control.HookSetup:
+		var input control.SetupHookInput
+		_ = json.Unmarshal(data, &input)
+		return &input
+	default:
+		return nil
+	}
 }
 
 func (h *ControlHandler) Interrupt(ctx context.Context) error {

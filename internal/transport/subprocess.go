@@ -49,8 +49,9 @@ type SubprocessTransport struct {
 	mu        sync.RWMutex
 	connected bool
 
-	env map[string]string
-	cwd *string
+	env            map[string]string
+	cwd            *string
+	stderrCallback func(string)
 }
 
 type SubprocessOption func(*SubprocessTransport)
@@ -78,6 +79,12 @@ func WithEnv(env map[string]string) SubprocessOption {
 func WithWorkingDirectory(cwd string) SubprocessOption {
 	return func(t *SubprocessTransport) {
 		t.cwd = &cwd
+	}
+}
+
+func WithStderrCallback(fn func(string)) SubprocessOption {
+	return func(t *SubprocessTransport) {
+		t.stderrCallback = fn
 	}
 }
 
@@ -145,6 +152,11 @@ func (t *SubprocessTransport) Connect(ctx context.Context) error {
 		args = cli.BuildCommand(t.cliPath, t.cmdOpts, t.closeStdin)
 	}
 
+	if t.cmdOpts != nil && t.cmdOpts.Executable != nil {
+		execArgs := append(t.cmdOpts.ExecutableArgs, args...)
+		args = append([]string{*t.cmdOpts.Executable}, execArgs...)
+	}
+
 	t.cmd = exec.CommandContext(ctx, args[0], args[1:]...)
 
 	env := os.Environ()
@@ -183,7 +195,22 @@ func (t *SubprocessTransport) Connect(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to create stderr file: %w", err)
 	}
-	t.cmd.Stderr = t.stderr
+	if t.stderrCallback != nil {
+		stderrPipe, pipeErr := t.cmd.StderrPipe()
+		if pipeErr != nil {
+			return fmt.Errorf("failed to create stderr pipe: %w", pipeErr)
+		}
+		go func() {
+			scanner := bufio.NewScanner(stderrPipe)
+			for scanner.Scan() {
+				line := scanner.Text()
+				fmt.Fprintln(t.stderr, line)
+				t.stderrCallback(line)
+			}
+		}()
+	} else {
+		t.cmd.Stderr = t.stderr
+	}
 
 	if err := t.cmd.Start(); err != nil {
 		t.cleanup()

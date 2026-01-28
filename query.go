@@ -18,7 +18,22 @@ func Query(ctx context.Context, prompt string, opts ...Option) (MessageIterator,
 	}
 
 	cmdOpts := buildCommandOptions(options)
-	t := transport.NewSubprocessTransport(cliPath, cmdOpts, transport.WithPrompt(prompt))
+	var tOpts []transport.SubprocessOption
+	tOpts = append(tOpts, transport.WithPrompt(prompt))
+	if options.Env != nil {
+		tOpts = append(tOpts, transport.WithEnv(options.Env))
+	}
+	if options.Stderr != nil {
+		tOpts = append(tOpts, transport.WithStderrCallback(options.Stderr))
+	}
+	t := transport.NewSubprocessTransport(cliPath, cmdOpts, tOpts...)
+
+	if options.CanUseTool != nil {
+		t.Control().SetCanUseTool(options.CanUseTool)
+	}
+	if options.Hooks != nil {
+		t.Control().SetHooks(options.Hooks)
+	}
 
 	if err := t.Connect(ctx); err != nil {
 		return nil, fmt.Errorf("failed to connect: %w", err)
@@ -38,7 +53,21 @@ func QueryWithInput(ctx context.Context, input <-chan message.UserMessage, opts 
 	}
 
 	cmdOpts := buildCommandOptions(options)
-	t := transport.NewSubprocessTransport(cliPath, cmdOpts)
+	var tOpts []transport.SubprocessOption
+	if options.Env != nil {
+		tOpts = append(tOpts, transport.WithEnv(options.Env))
+	}
+	if options.Stderr != nil {
+		tOpts = append(tOpts, transport.WithStderrCallback(options.Stderr))
+	}
+	t := transport.NewSubprocessTransport(cliPath, cmdOpts, tOpts...)
+
+	if options.CanUseTool != nil {
+		t.Control().SetCanUseTool(options.CanUseTool)
+	}
+	if options.Hooks != nil {
+		t.Control().SetHooks(options.Hooks)
+	}
 
 	if err := t.Connect(ctx); err != nil {
 		return nil, fmt.Errorf("failed to connect: %w", err)
@@ -98,6 +127,8 @@ func buildCommandOptions(options *Options) *cli.CommandOptions {
 		MaxThinkingTokens:               options.MaxThinkingTokens,
 		PermissionMode:                  options.PermissionMode,
 		PermissionPromptToolName:        options.PermissionPromptToolName,
+		Executable:                      options.Executable,
+		ExecutableArgs:                  options.ExecutableArgs,
 	}
 
 	// When CanUseTool callback is set, tell CLI to send permission prompts via stdio

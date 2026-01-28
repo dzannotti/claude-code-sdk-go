@@ -41,6 +41,8 @@ type CommandOptions struct {
 	Sandbox                         any
 	Plugins                         any
 	OutputFormat                    any
+	Executable                      *string
+	ExecutableArgs                  []string
 }
 
 func BuildCommand(cliPath string, opts *CommandOptions, closeStdin bool) []string {
@@ -52,6 +54,15 @@ func BuildCommand(cliPath string, opts *CommandOptions, closeStdin bool) []strin
 		cmd = append(cmd, "--input-format", "stream-json")
 	}
 
+	return appendFlags(cmd, opts)
+}
+
+func BuildCommandWithPrompt(cliPath string, opts *CommandOptions, prompt string) []string {
+	cmd := []string{cliPath, "--output-format", "stream-json", "--verbose", "--print", prompt}
+	return appendFlags(cmd, opts)
+}
+
+func appendFlags(cmd []string, opts *CommandOptions) []string {
 	if opts == nil {
 		return cmd
 	}
@@ -130,105 +141,6 @@ func BuildCommand(cliPath string, opts *CommandOptions, closeStdin bool) []strin
 	}
 	for _, source := range opts.SettingSources {
 		cmd = append(cmd, "--settings-source", source)
-	}
-	if opts.AllowDangerouslySkipPermissions {
-		cmd = append(cmd, "--dangerously-skip-permissions")
-	}
-	if opts.IncludePartialMessages {
-		cmd = append(cmd, "--include-partial-messages")
-	}
-	if opts.Tools != nil {
-		if data, err := json.Marshal(opts.Tools); err == nil {
-			cmd = append(cmd, "--tools", string(data))
-		}
-	}
-	if opts.Sandbox != nil {
-		if data, err := json.Marshal(opts.Sandbox); err == nil {
-			cmd = append(cmd, "--sandbox", string(data))
-		}
-	}
-	if opts.Plugins != nil {
-		if data, err := json.Marshal(opts.Plugins); err == nil {
-			cmd = append(cmd, "--plugins", string(data))
-		}
-	}
-	if opts.OutputFormat != nil {
-		if data, err := json.Marshal(opts.OutputFormat); err == nil {
-			cmd = append(cmd, "--output-format-config", string(data))
-		}
-	}
-
-	for flag, value := range opts.ExtraArgs {
-		if value == nil {
-			cmd = append(cmd, "--"+flag)
-		} else {
-			cmd = append(cmd, "--"+flag, *value)
-		}
-	}
-
-	return cmd
-}
-
-func BuildCommandWithPrompt(cliPath string, opts *CommandOptions, prompt string) []string {
-	cmd := []string{cliPath, "--output-format", "stream-json", "--verbose", "--print", prompt}
-
-	if opts == nil {
-		return cmd
-	}
-
-	if len(opts.AllowedTools) > 0 {
-		cmd = append(cmd, "--allowed-tools", strings.Join(opts.AllowedTools, ","))
-	}
-	if len(opts.DisallowedTools) > 0 {
-		cmd = append(cmd, "--disallowed-tools", strings.Join(opts.DisallowedTools, ","))
-	}
-	if opts.SystemPrompt != nil {
-		cmd = append(cmd, "--system-prompt", *opts.SystemPrompt)
-	}
-	if opts.AppendSystemPrompt != nil {
-		cmd = append(cmd, "--append-system-prompt", *opts.AppendSystemPrompt)
-	}
-	if opts.Model != nil {
-		cmd = append(cmd, "--model", *opts.Model)
-	}
-	if opts.FallbackModel != nil {
-		cmd = append(cmd, "--fallback-model", *opts.FallbackModel)
-	}
-	if opts.PermissionMode != nil {
-		cmd = append(cmd, "--permission-mode", string(*opts.PermissionMode))
-	}
-	if opts.Continue {
-		cmd = append(cmd, "--continue")
-	}
-	if opts.Resume != nil {
-		cmd = append(cmd, "--resume", *opts.Resume)
-	}
-	if opts.ResumeSessionAt != nil {
-		cmd = append(cmd, "--resume-at", *opts.ResumeSessionAt)
-	}
-	if opts.ForkSession {
-		cmd = append(cmd, "--fork-session")
-	}
-	if opts.PersistSession != nil && !*opts.PersistSession {
-		cmd = append(cmd, "--no-persist")
-	}
-	if opts.MaxTurns != nil {
-		cmd = append(cmd, "--max-turns", fmt.Sprintf("%d", *opts.MaxTurns))
-	}
-	if opts.Cwd != nil {
-		cmd = append(cmd, "--cwd", *opts.Cwd)
-	}
-	for _, dir := range opts.AdditionalDirectories {
-		cmd = append(cmd, "--add-dir", dir)
-	}
-	if opts.StrictMcpConfig {
-		cmd = append(cmd, "--strict-mcp-config")
-	}
-	if opts.Agent != nil {
-		cmd = append(cmd, "--agent", *opts.Agent)
-	}
-	if opts.EnableFileCheckpointing {
-		cmd = append(cmd, "--enable-file-checkpointing")
 	}
 	if opts.AllowDangerouslySkipPermissions {
 		cmd = append(cmd, "--dangerously-skip-permissions")

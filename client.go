@@ -110,6 +110,9 @@ func (c *clientImpl) Connect(ctx context.Context) error {
 	if c.options.Env != nil {
 		opts = append(opts, transport.WithEnv(c.options.Env))
 	}
+	if c.options.Stderr != nil {
+		opts = append(opts, transport.WithStderrCallback(c.options.Stderr))
+	}
 
 	t := transport.NewSubprocessTransport(c.cliPath, cmdOpts, opts...)
 
@@ -238,7 +241,26 @@ func (c *clientImpl) Messages(ctx context.Context) <-chan message.Message {
 	}
 
 	msgChan, _ := t.ReceiveMessages(ctx)
-	return msgChan
+
+	out := make(chan message.Message, cap(msgChan))
+	go func() {
+		defer close(out)
+		for msg := range msgChan {
+			if sid := msg.GetSessionID(); sid != "" {
+				c.mu.Lock()
+				if c.sessionID == "" {
+					c.sessionID = sid
+				}
+				c.mu.Unlock()
+			}
+			select {
+			case out <- msg:
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+	return out
 }
 
 func (c *clientImpl) Errors(ctx context.Context) <-chan error {

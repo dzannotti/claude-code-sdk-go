@@ -2,6 +2,8 @@
 
 Go SDK for programmatic control of [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code).
 
+> **Feature parity** with [`@anthropic-ai/claude-agent-sdk`](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) v0.2.22 (all stable APIs). Unstable/preview APIs (`unstable_v2_*`) are not ported.
+
 ## Requirements
 
 - Go 1.21+
@@ -123,7 +125,7 @@ iter, err := claudecode.Query(ctx, "Hello",
     claudecode.WithModel("claude-sonnet-4-20250514"),
     claudecode.WithMaxTurns(3),
     claudecode.WithSystemPrompt("You are a helpful assistant"),
-    claudecode.WithWorkingDirectory("/path/to/project"),
+    claudecode.WithCwd("/path/to/project"),
     claudecode.WithPermissionMode(claudecode.PermissionModeAcceptEdits),
     claudecode.WithIncludePartialMessages(), // Enable token streaming
 )
@@ -142,15 +144,31 @@ err := claudecode.WithClient(ctx, func(c claudecode.Client) error {
 | Option | Description |
 |--------|-------------|
 | `WithModel(model)` | Specify Claude model to use |
+| `WithFallbackModel(model)` | Fallback model if primary unavailable |
 | `WithMaxTurns(n)` | Limit agentic turns |
+| `WithMaxBudgetUSD(budget)` | Maximum cost budget |
+| `WithMaxThinkingTokens(n)` | Max tokens for extended thinking |
 | `WithSystemPrompt(prompt)` | Custom system prompt |
-| `WithAppendSystemPrompt(prompt)` | Append to default system prompt |
-| `WithWorkingDirectory(path)` | Set working directory for tools |
+| `WithSystemPromptPreset(preset, append)` | Use a system prompt preset |
+| `WithCwd(path)` | Set working directory |
+| `WithAdditionalDirectories(dirs...)` | Add extra directories |
 | `WithPermissionMode(mode)` | Control tool permissions |
+| `WithCanUseTool(fn)` | Custom permission callback |
 | `WithAllowedTools(tools...)` | Restrict available tools |
 | `WithDisallowedTools(tools...)` | Block specific tools |
 | `WithMcpServers(config)` | Configure MCP servers |
+| `WithHooks(event, matchers...)` | Register lifecycle hooks |
 | `WithIncludePartialMessages()` | Enable token-by-token streaming |
+| `WithOutputFormat(format)` | Structured JSON output |
+| `WithSandbox(settings)` | Sandbox configuration |
+| `WithExecutable(exe, args...)` | Node runtime to use (bun, deno, node) |
+| `WithEnv(env)` | Environment variables |
+| `WithStderr(fn)` | Stderr callback |
+| `WithResume(sessionID)` | Resume a session |
+| `WithContinue()` | Continue last conversation |
+| `WithForkSession()` | Fork an existing session |
+| `WithBetas(betas...)` | Enable beta features |
+| `WithAgents(agents)` | Define sub-agents |
 
 ## Message Types
 
@@ -179,14 +197,13 @@ The Client API supports bidirectional control:
 ```go
 err := claudecode.WithClient(ctx, func(c claudecode.Client) error {
     // Change model mid-conversation
-    model := "claude-sonnet-4-20250514"
-    c.SetModel(ctx, &model)
+    c.SetModel(ctx, "claude-sonnet-4-20250514")
 
     // Interrupt current operation
     c.Interrupt(ctx)
 
     // Get MCP server status
-    statuses, _ := c.McpStatus(ctx)
+    statuses, _ := c.McpServerStatus(ctx)
 
     return nil
 })
@@ -228,7 +245,11 @@ See the [`examples/`](./examples) directory:
 - `02_client_streaming/` - Streaming with Client API
 - `03_client_multi_turn/` - Multi-turn conversations
 - `04_session_resume/` - Load history and resume sessions
+- `05_hooks/` - Lifecycle hooks
+- `06_mcp_servers/` - MCP server configuration
+- `07_permissions/` - Custom permission handling
 - `08_client_advanced/` - Advanced client features
+- `09_output_format/` - Structured JSON output
 - `10_context_manager/` - Context and cancellation
 - `interactive_chat/` - Full interactive chat with tools
 - `slash_commands/` - Discover custom slash commands
