@@ -143,6 +143,119 @@ func (m *AuthStatusMessage) MessageType() string  { return "auth_status" }
 func (m *AuthStatusMessage) GetSessionID() string { return m.SessionID }
 func (m *AuthStatusMessage) GetUUID() string      { return m.UUID }
 
+type UserMessageReplay struct {
+	Type            string      `json:"type"`
+	Message         UserContent `json:"message"`
+	ParentToolUseID *string     `json:"parent_tool_use_id"`
+	UUID            string      `json:"uuid"`
+	SessionID       string      `json:"session_id"`
+}
+
+func (m *UserMessageReplay) MessageType() string  { return "user_message_replay" }
+func (m *UserMessageReplay) GetSessionID() string { return m.SessionID }
+func (m *UserMessageReplay) GetUUID() string      { return m.UUID }
+
+type CompactBoundaryMessage struct {
+	Type      string           `json:"type"`
+	Subtype   string           `json:"subtype"`
+	Metadata  *CompactMetadata `json:"metadata,omitempty"`
+	UUID      string           `json:"uuid"`
+	SessionID string           `json:"session_id"`
+}
+
+func (m *CompactBoundaryMessage) MessageType() string  { return "compact_boundary" }
+func (m *CompactBoundaryMessage) GetSessionID() string { return m.SessionID }
+func (m *CompactBoundaryMessage) GetUUID() string      { return m.UUID }
+
+type StatusMessage struct {
+	Type      string `json:"type"`
+	Status    string `json:"status"`
+	Message   string `json:"message,omitempty"`
+	UUID      string `json:"uuid"`
+	SessionID string `json:"session_id"`
+}
+
+func (m *StatusMessage) MessageType() string  { return "status" }
+func (m *StatusMessage) GetSessionID() string { return m.SessionID }
+func (m *StatusMessage) GetUUID() string      { return m.UUID }
+
+type HookStartedMessage struct {
+	Type      string `json:"type"`
+	Subtype   string `json:"subtype"`
+	HookID    string `json:"hook_id"`
+	HookName  string `json:"hook_name"`
+	HookEvent string `json:"hook_event"`
+	UUID      string `json:"uuid"`
+	SessionID string `json:"session_id"`
+}
+
+func (m *HookStartedMessage) MessageType() string  { return "hook_started" }
+func (m *HookStartedMessage) GetSessionID() string { return m.SessionID }
+func (m *HookStartedMessage) GetUUID() string      { return m.UUID }
+
+type HookProgressMessage struct {
+	Type      string `json:"type"`
+	Subtype   string `json:"subtype"`
+	HookID    string `json:"hook_id"`
+	HookName  string `json:"hook_name"`
+	HookEvent string `json:"hook_event"`
+	Stdout    string `json:"stdout"`
+	Stderr    string `json:"stderr"`
+	Output    string `json:"output"`
+	UUID      string `json:"uuid"`
+	SessionID string `json:"session_id"`
+}
+
+func (m *HookProgressMessage) MessageType() string  { return "hook_progress" }
+func (m *HookProgressMessage) GetSessionID() string { return m.SessionID }
+func (m *HookProgressMessage) GetUUID() string      { return m.UUID }
+
+type HookResponseMessage struct {
+	Type      string `json:"type"`
+	Subtype   string `json:"subtype"`
+	HookID    string `json:"hook_id"`
+	HookName  string `json:"hook_name"`
+	HookEvent string `json:"hook_event"`
+	Output    string `json:"output"`
+	Stdout    string `json:"stdout"`
+	Stderr    string `json:"stderr"`
+	ExitCode  *int   `json:"exit_code,omitempty"`
+	Outcome   string `json:"outcome"`
+	UUID      string `json:"uuid"`
+	SessionID string `json:"session_id"`
+}
+
+func (m *HookResponseMessage) MessageType() string  { return "hook_response" }
+func (m *HookResponseMessage) GetSessionID() string { return m.SessionID }
+func (m *HookResponseMessage) GetUUID() string      { return m.UUID }
+
+type TaskNotificationMessage struct {
+	Type       string `json:"type"`
+	Subtype    string `json:"subtype"`
+	TaskID     string `json:"task_id"`
+	Status     string `json:"status"`
+	OutputFile string `json:"output_file"`
+	Summary    string `json:"summary"`
+	UUID       string `json:"uuid"`
+	SessionID  string `json:"session_id"`
+}
+
+func (m *TaskNotificationMessage) MessageType() string  { return "task_notification" }
+func (m *TaskNotificationMessage) GetSessionID() string { return m.SessionID }
+func (m *TaskNotificationMessage) GetUUID() string      { return m.UUID }
+
+type ToolUseSummaryMessage struct {
+	Type                string   `json:"type"`
+	Summary             string   `json:"summary"`
+	PrecedingToolUseIDs []string `json:"preceding_tool_use_ids"`
+	UUID                string   `json:"uuid"`
+	SessionID           string   `json:"session_id"`
+}
+
+func (m *ToolUseSummaryMessage) MessageType() string  { return "tool_use_summary" }
+func (m *ToolUseSummaryMessage) GetSessionID() string { return m.SessionID }
+func (m *ToolUseSummaryMessage) GetUUID() string      { return m.UUID }
+
 // RawMessage captures unknown message types to avoid breaking on new CLI message types.
 // This provides forward compatibility - the SDK won't error on new types it doesn't recognize.
 type RawMessage struct {
@@ -179,6 +292,7 @@ type ModelUsage struct {
 	WebSearchRequests        int     `json:"webSearchRequests"`
 	CostUSD                  float64 `json:"costUSD"`
 	ContextWindow            int     `json:"contextWindow"`
+	MaxOutputTokens          int     `json:"maxOutputTokens"`
 }
 
 type PermissionDenial struct {

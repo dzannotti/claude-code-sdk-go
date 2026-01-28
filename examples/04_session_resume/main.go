@@ -10,9 +10,9 @@ import (
 	"log"
 	"os"
 
-	"claudecode"
-	"claudecode/message"
-	"claudecode/session"
+	"claudeagent"
+	"claudeagent/message"
+	"claudeagent/session"
 )
 
 func main() {
@@ -99,9 +99,9 @@ func continueSession(sessionID string) {
 
 	// Resume the session
 	ctx := context.Background()
-	iter, err := claudecode.Query(ctx, "What were we just talking about? Give a brief summary.",
-		claudecode.WithResume(sessionID),
-		claudecode.WithMaxTurns(1),
+	iter, err := claudeagent.Query(ctx, "What were we just talking about? Give a brief summary.",
+		claudeagent.WithResume(sessionID),
+		claudeagent.WithMaxTurns(1),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -110,7 +110,7 @@ func continueSession(sessionID string) {
 
 	for {
 		msg, err := iter.Next(ctx)
-		if errors.Is(err, claudecode.ErrDone) {
+		if errors.Is(err, claudeagent.ErrDone) {
 			break
 		}
 		if err != nil {

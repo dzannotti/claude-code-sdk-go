@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"claudecode"
+	"claudeagent"
 )
 
 var debugLog *os.File
@@ -39,10 +39,10 @@ func main() {
 
 	ctx := context.Background()
 
-	client, err := claudecode.NewClient(
-		claudecode.WithAllowedTools("Read", "Write", "Bash", "Glob", "Grep"),
-		claudecode.WithSystemPrompt("You are a helpful assistant. When using tools, briefly explain what you're doing."),
-		claudecode.WithIncludePartialMessages(), // Enable token streaming
+	client, err := claudeagent.NewClient(
+		claudeagent.WithAllowedTools("Read", "Write", "Bash", "Glob", "Grep"),
+		claudeagent.WithSystemPrompt("You are a helpful assistant. When using tools, briefly explain what you're doing."),
+		claudeagent.WithIncludePartialMessages(), // Enable token streaming
 	)
 	if err != nil {
 		fmt.Printf("Failed to create client: %v\n", err)
@@ -87,7 +87,7 @@ func main() {
 	}
 }
 
-func streamResponse(ctx context.Context, client claudecode.Client) error {
+func streamResponse(ctx context.Context, client claudeagent.Client) error {
 	msgChan := client.Messages(ctx)
 
 	for {
@@ -103,22 +103,22 @@ func streamResponse(ctx context.Context, client claudecode.Client) error {
 			debugf("MSG [%T]: %s", msg, string(msgJSON))
 
 			switch m := msg.(type) {
-			case *claudecode.StreamEvent:
+			case *claudeagent.StreamEvent:
 				// Handle streaming events for real-time output
 				debugf("  StreamEvent type: %v", m.Event)
 				handleStreamEvent(m.Event)
 
-			case *claudecode.AssistantMessage:
+			case *claudeagent.AssistantMessage:
 				// Full message (fallback if streaming events aren't sent)
 				for _, block := range m.Message.Content {
 					switch b := block.(type) {
-					case *claudecode.TextBlock:
+					case *claudeagent.TextBlock:
 						fmt.Print(b.Text)
 
-					case *claudecode.ThinkingBlock:
+					case *claudeagent.ThinkingBlock:
 						fmt.Printf("\n[Thinking: %s...]\n", truncate(b.Thinking, 50))
 
-					case *claudecode.ToolUseBlock:
+					case *claudeagent.ToolUseBlock:
 						fmt.Printf("\n[Tool: %s", b.Name)
 						if cmd, ok := b.Input["command"].(string); ok {
 							fmt.Printf(" → %s", truncate(cmd, 40))
@@ -131,7 +131,7 @@ func streamResponse(ctx context.Context, client claudecode.Client) error {
 					}
 				}
 
-			case *claudecode.UserMessage:
+			case *claudeagent.UserMessage:
 				if blocks, ok := m.Message.Content.([]any); ok {
 					for _, block := range blocks {
 						if blockMap, ok := block.(map[string]any); ok {
@@ -151,13 +151,13 @@ func streamResponse(ctx context.Context, client claudecode.Client) error {
 					}
 				}
 
-			case *claudecode.ResultMessage:
+			case *claudeagent.ResultMessage:
 				if m.IsError {
 					return fmt.Errorf("error: %s", m.Result)
 				}
 				return nil
 
-			case *claudecode.SystemMessage:
+			case *claudeagent.SystemMessage:
 				// Ignore system messages (init, etc.)
 			}
 

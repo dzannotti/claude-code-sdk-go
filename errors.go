@@ -1,4 +1,4 @@
-package claudecode
+package claudeagent
 
 import (
 	"errors"
@@ -9,7 +9,23 @@ var (
 	ErrDone          = errors.New("no more messages")
 	ErrNotConnected  = errors.New("client not connected")
 	ErrAlreadyClosed = errors.New("client already closed")
+	ErrAborted       = errors.New("operation aborted")
 )
+
+type AbortError struct {
+	Message string
+}
+
+func (e *AbortError) Error() string {
+	if e.Message != "" {
+		return fmt.Sprintf("aborted: %s", e.Message)
+	}
+	return "aborted"
+}
+
+func (e *AbortError) Is(target error) bool {
+	return target == ErrAborted
+}
 
 type CLINotFoundError struct {
 	SearchedPaths []string

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"claudecode/control"
+	"claudeagent/control"
 )
 
 func TestBuildCommand_Basic(t *testing.T) {

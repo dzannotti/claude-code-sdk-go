@@ -1,4 +1,4 @@
-// Package claudecode provides a Go SDK for programmatic control of Claude Code CLI.
+// Package claudeagent provides a Go SDK for programmatic control of Claude Agent CLI.
 //
 // The SDK offers two main APIs:
 //
@@ -7,7 +7,7 @@
 //
 // Basic usage with Query API:
 //
-//	iter, err := claudecode.Query(ctx, "What is 2+2?")
+//	iter, err := claudeagent.Query(ctx, "What is 2+2?")
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
@@ -15,7 +15,7 @@
 //
 //	for {
 //	    msg, err := iter.Next(ctx)
-//	    if errors.Is(err, claudecode.ErrDone) {
+//	    if errors.Is(err, claudeagent.ErrDone) {
 //	        break
 //	    }
 //	    if err != nil {
@@ -26,7 +26,7 @@
 //
 // Interactive usage with Client API:
 //
-//	err := claudecode.WithClient(ctx, func(c claudecode.Client) error {
+//	err := claudeagent.WithClient(ctx, func(c claudeagent.Client) error {
 //	    if err := c.Query(ctx, "Hello"); err != nil {
 //	        return err
 //	    }
@@ -35,4 +35,4 @@
 //	    }
 //	    return nil
 //	})
-package claudecode
+package claudeagent

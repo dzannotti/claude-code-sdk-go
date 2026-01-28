@@ -1,7 +1,7 @@
-package claudecode
+package claudeagent
 
 import (
-	"claudecode/internal/cli"
+	"claudeagent/internal/cli"
 )
 
 func FindCLI() (string, error) {

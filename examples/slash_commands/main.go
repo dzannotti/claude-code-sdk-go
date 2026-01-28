@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"claudecode"
+	"claudeagent"
 )
 
 func main() {
@@ -16,8 +16,8 @@ func main() {
 
 	// Create client with project settings loaded (where custom commands live)
 	// Without WithSettingSources, no custom commands are loaded by default
-	client, err := claudecode.NewClient(
-		claudecode.WithSettingSources("user", "project"), // Load user + project settings
+	client, err := claudeagent.NewClient(
+		claudeagent.WithSettingSources("user", "project"), // Load user + project settings
 	)
 	if err != nil {
 		fmt.Printf("Failed to create client: %v\n", err)

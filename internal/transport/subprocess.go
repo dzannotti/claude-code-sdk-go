@@ -14,10 +14,10 @@ import (
 	"syscall"
 	"time"
 
-	"claudecode/internal/cli"
-	"claudecode/internal/parser"
-	"claudecode/internal/protocol"
-	"claudecode/message"
+	"claudeagent/internal/cli"
+	"claudeagent/internal/parser"
+	"claudeagent/internal/protocol"
+	"claudeagent/message"
 )
 
 const (

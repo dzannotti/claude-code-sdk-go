@@ -1,11 +1,11 @@
-package claudecode
+package claudeagent
 
 import (
 	"context"
 	"testing"
 
-	"claudecode/control"
-	"claudecode/mcp"
+	"claudeagent/control"
+	"claudeagent/mcp"
 )
 
 func TestWithModel(t *testing.T) {
@@ -37,8 +37,21 @@ func TestWithSystemPromptPreset(t *testing.T) {
 
 func TestWithTools(t *testing.T) {
 	opts := applyOptions([]Option{WithTools("Bash", "Read", "Write")})
-	if len(opts.Tools) != 3 {
-		t.Errorf("expected 3 tools, got %d", len(opts.Tools))
+	if opts.Tools == nil || len(opts.Tools.Tools) != 3 {
+		t.Errorf("expected 3 tools, got %v", opts.Tools)
+	}
+}
+
+func TestWithToolsPreset(t *testing.T) {
+	opts := applyOptions([]Option{WithToolsPreset("claude_code")})
+	if opts.Tools == nil || opts.Tools.Preset == nil {
+		t.Fatal("expected Tools preset to be set")
+	}
+	if opts.Tools.Preset.Preset != "claude_code" {
+		t.Errorf("expected preset 'claude_code', got %q", opts.Tools.Preset.Preset)
+	}
+	if opts.Tools.Preset.Type != "preset" {
+		t.Errorf("expected type 'preset', got %q", opts.Tools.Preset.Type)
 	}
 }
 

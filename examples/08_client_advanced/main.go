@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"claudecode"
+	"claudeagent"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 
 	ctx := context.Background()
 
-	err := claudecode.WithClient(ctx, func(client claudecode.Client) error {
+	err := claudeagent.WithClient(ctx, func(client claudeagent.Client) error {
 		fmt.Println("\nConnected with custom configuration!")
 
 		questions := []string{
@@ -40,19 +40,19 @@ func main() {
 		fmt.Println("\nAdvanced session completed!")
 		return nil
 	},
-		claudecode.WithSystemPrompt("You are a senior Go developer providing code reviews and architectural guidance."),
-		claudecode.WithAllowedTools("Read", "Write"),
+		claudeagent.WithSystemPrompt("You are a senior Go developer providing code reviews and architectural guidance."),
+		claudeagent.WithAllowedTools("Read", "Write"),
 	)
 
 	if err != nil {
-		var cliError *claudecode.CLINotFoundError
+		var cliError *claudeagent.CLINotFoundError
 		if errors.As(err, &cliError) {
 			fmt.Printf("Claude CLI not installed: %v\n", cliError)
 			fmt.Println("Install: npm install -g @anthropic-ai/claude-code")
 			return
 		}
 
-		var connError *claudecode.ConnectionError
+		var connError *claudeagent.ConnectionError
 		if errors.As(err, &connError) {
 			fmt.Printf("Connection failed: %v\n", connError)
 			fmt.Println("WithClient handled cleanup automatically")
@@ -65,7 +65,7 @@ func main() {
 	fmt.Println("\nAdvanced features demonstration completed!")
 }
 
-func streamResponse(ctx context.Context, client claudecode.Client) error {
+func streamResponse(ctx context.Context, client claudeagent.Client) error {
 	fmt.Println("\nResponse:")
 
 	msgChan := client.Messages(ctx)
@@ -77,13 +77,13 @@ func streamResponse(ctx context.Context, client claudecode.Client) error {
 			}
 
 			switch m := msg.(type) {
-			case *claudecode.AssistantMessage:
+			case *claudeagent.AssistantMessage:
 				for _, block := range m.Message.Content {
-					if textBlock, ok := block.(*claudecode.TextBlock); ok {
+					if textBlock, ok := block.(*claudeagent.TextBlock); ok {
 						fmt.Print(textBlock.Text)
 					}
 				}
-			case *claudecode.ResultMessage:
+			case *claudeagent.ResultMessage:
 				if m.IsError {
 					return fmt.Errorf("error: %s", m.Result)
 				}

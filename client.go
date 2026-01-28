@@ -1,14 +1,14 @@
-package claudecode
+package claudeagent
 
 import (
 	"context"
 	"fmt"
 	"sync"
 
-	"claudecode/control"
-	"claudecode/internal/transport"
-	"claudecode/mcp"
-	"claudecode/message"
+	"claudeagent/control"
+	"claudeagent/internal/transport"
+	"claudeagent/mcp"
+	"claudeagent/message"
 )
 
 type Client interface {
@@ -18,6 +18,7 @@ type Client interface {
 
 	Query(ctx context.Context, prompt string) error
 	QueryWithSession(ctx context.Context, prompt string, sessionID string) error
+	StreamInput(ctx context.Context, input <-chan message.UserMessage) error
 
 	Messages(ctx context.Context) <-chan message.Message
 	Errors(ctx context.Context) <-chan error
@@ -26,9 +27,12 @@ type Client interface {
 	SetPermissionMode(ctx context.Context, mode PermissionMode) error
 	SetModel(ctx context.Context, model string) error
 	RewindFiles(ctx context.Context, userMessageID string) error
+	RewindFilesWithOptions(ctx context.Context, userMessageID string, opts RewindFilesOptions) (*RewindFilesResult, error)
 
 	SetMcpServers(ctx context.Context, servers map[string]mcp.ServerConfig) (*mcp.SetServersResult, error)
 	McpServerStatus(ctx context.Context) ([]mcp.ServerStatus, error)
+	ReconnectMcpServer(ctx context.Context, serverName string) error
+	ToggleMcpServer(ctx context.Context, serverName string, enabled bool) error
 	SetMaxThinkingTokens(ctx context.Context, tokens *int) error
 
 	SupportedCommands(ctx context.Context) ([]SlashCommand, error)
@@ -36,6 +40,18 @@ type Client interface {
 	AccountInfo(ctx context.Context) (*AccountInfo, error)
 
 	SessionID() string
+}
+
+type RewindFilesOptions struct {
+	DryRun bool
+}
+
+type RewindFilesResult struct {
+	CanRewind    bool     `json:"canRewind"`
+	Error        *string  `json:"error,omitempty"`
+	FilesChanged []string `json:"filesChanged,omitempty"`
+	Insertions   *int     `json:"insertions,omitempty"`
+	Deletions    *int     `json:"deletions,omitempty"`
 }
 
 type clientImpl struct {
@@ -358,4 +374,78 @@ func (c *clientImpl) SessionID() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.sessionID
+}
+
+func (c *clientImpl) StreamInput(ctx context.Context, input <-chan message.UserMessage) error {
+	c.mu.RLock()
+	t := c.transport
+	c.mu.RUnlock()
+
+	if t == nil || !t.IsConnected() {
+		return ErrNotConnected
+	}
+
+	go func() {
+		for msg := range input {
+			streamMsg := transport.StreamMessage{
+				Type: "user",
+				Message: message.UserContent{
+					Role:    "user",
+					Content: msg.Message.Content,
+				},
+				SessionID: msg.SessionID,
+			}
+			if err := t.SendMessage(ctx, streamMsg); err != nil {
+				return
+			}
+		}
+	}()
+
+	return nil
+}
+
+func (c *clientImpl) RewindFilesWithOptions(ctx context.Context, userMessageID string, opts RewindFilesOptions) (*RewindFilesResult, error) {
+	c.mu.RLock()
+	t := c.transport
+	c.mu.RUnlock()
+
+	if t == nil || !t.IsConnected() {
+		return nil, ErrNotConnected
+	}
+
+	result, err := t.Control().RewindFilesWithOptions(ctx, userMessageID, opts.DryRun)
+	if err != nil {
+		return nil, err
+	}
+	return &RewindFilesResult{
+		CanRewind:    result.CanRewind,
+		Error:        result.Error,
+		FilesChanged: result.FilesChanged,
+		Insertions:   result.Insertions,
+		Deletions:    result.Deletions,
+	}, nil
+}
+
+func (c *clientImpl) ReconnectMcpServer(ctx context.Context, serverName string) error {
+	c.mu.RLock()
+	t := c.transport
+	c.mu.RUnlock()
+
+	if t == nil || !t.IsConnected() {
+		return ErrNotConnected
+	}
+
+	return t.Control().ReconnectMcpServer(ctx, serverName)
+}
+
+func (c *clientImpl) ToggleMcpServer(ctx context.Context, serverName string, enabled bool) error {
+	c.mu.RLock()
+	t := c.transport
+	c.mu.RUnlock()
+
+	if t == nil || !t.IsConnected() {
+		return ErrNotConnected
+	}
+
+	return t.Control().ToggleMcpServer(ctx, serverName, enabled)
 }

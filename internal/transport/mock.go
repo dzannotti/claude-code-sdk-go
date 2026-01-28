@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"claudecode/message"
+	"claudeagent/message"
 )
 
 type MockTransport struct {

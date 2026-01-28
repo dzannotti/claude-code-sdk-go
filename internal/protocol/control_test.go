@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"claudecode/control"
-	"claudecode/mcp"
+	"claudeagent/control"
+	"claudeagent/mcp"
 )
 
 type mockSender struct {

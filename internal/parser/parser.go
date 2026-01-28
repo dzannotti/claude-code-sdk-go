@@ -3,7 +3,7 @@ package parser
 import (
 	"fmt"
 
-	"claudecode/message"
+	"claudeagent/message"
 )
 
 const maxBufferSize = 1 << 20 // 1MB

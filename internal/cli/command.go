@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"claudecode/control"
-	"claudecode/mcp"
+	"claudeagent/control"
+	"claudeagent/mcp"
 )
 
 type CommandOptions struct {
@@ -15,21 +15,32 @@ type CommandOptions struct {
 	SystemPrompt                    *string
 	AppendSystemPrompt              *string
 	Model                           *string
+	FallbackModel                   *string
 	MaxThinkingTokens               *int
 	PermissionMode                  *control.PermissionMode
 	PermissionPromptToolName        *string
 	Continue                        bool
 	Resume                          *string
+	ResumeSessionAt                 *string
+	ForkSession                     bool
+	PersistSession                  *bool
 	MaxTurns                        *int
 	MaxBudgetUSD                    *float64
 	Cwd                             *string
 	AdditionalDirectories           []string
 	McpServers                      map[string]mcp.ServerConfig
+	StrictMcpConfig                 bool
+	Agent                           *string
+	EnableFileCheckpointing         bool
 	Betas                           []string
 	ExtraArgs                       map[string]*string
 	SettingSources                  []string
 	AllowDangerouslySkipPermissions bool
 	IncludePartialMessages          bool
+	Tools                           any
+	Sandbox                         any
+	Plugins                         any
+	OutputFormat                    any
 }
 
 func BuildCommand(cliPath string, opts *CommandOptions, closeStdin bool) []string {
@@ -60,6 +71,9 @@ func BuildCommand(cliPath string, opts *CommandOptions, closeStdin bool) []strin
 	if opts.Model != nil {
 		cmd = append(cmd, "--model", *opts.Model)
 	}
+	if opts.FallbackModel != nil {
+		cmd = append(cmd, "--fallback-model", *opts.FallbackModel)
+	}
 	if opts.MaxThinkingTokens != nil {
 		cmd = append(cmd, "--max-thinking-tokens", fmt.Sprintf("%d", *opts.MaxThinkingTokens))
 	}
@@ -74,6 +88,15 @@ func BuildCommand(cliPath string, opts *CommandOptions, closeStdin bool) []strin
 	}
 	if opts.Resume != nil {
 		cmd = append(cmd, "--resume", *opts.Resume)
+	}
+	if opts.ResumeSessionAt != nil {
+		cmd = append(cmd, "--resume-at", *opts.ResumeSessionAt)
+	}
+	if opts.ForkSession {
+		cmd = append(cmd, "--fork-session")
+	}
+	if opts.PersistSession != nil && !*opts.PersistSession {
+		cmd = append(cmd, "--no-persist")
 	}
 	if opts.MaxTurns != nil {
 		cmd = append(cmd, "--max-turns", fmt.Sprintf("%d", *opts.MaxTurns))
@@ -93,6 +116,15 @@ func BuildCommand(cliPath string, opts *CommandOptions, closeStdin bool) []strin
 			cmd = append(cmd, "--mcp-servers", string(data))
 		}
 	}
+	if opts.StrictMcpConfig {
+		cmd = append(cmd, "--strict-mcp-config")
+	}
+	if opts.Agent != nil {
+		cmd = append(cmd, "--agent", *opts.Agent)
+	}
+	if opts.EnableFileCheckpointing {
+		cmd = append(cmd, "--enable-file-checkpointing")
+	}
 	for _, beta := range opts.Betas {
 		cmd = append(cmd, "--beta", beta)
 	}
@@ -104,6 +136,26 @@ func BuildCommand(cliPath string, opts *CommandOptions, closeStdin bool) []strin
 	}
 	if opts.IncludePartialMessages {
 		cmd = append(cmd, "--include-partial-messages")
+	}
+	if opts.Tools != nil {
+		if data, err := json.Marshal(opts.Tools); err == nil {
+			cmd = append(cmd, "--tools", string(data))
+		}
+	}
+	if opts.Sandbox != nil {
+		if data, err := json.Marshal(opts.Sandbox); err == nil {
+			cmd = append(cmd, "--sandbox", string(data))
+		}
+	}
+	if opts.Plugins != nil {
+		if data, err := json.Marshal(opts.Plugins); err == nil {
+			cmd = append(cmd, "--plugins", string(data))
+		}
+	}
+	if opts.OutputFormat != nil {
+		if data, err := json.Marshal(opts.OutputFormat); err == nil {
+			cmd = append(cmd, "--output-format-config", string(data))
+		}
 	}
 
 	for flag, value := range opts.ExtraArgs {
@@ -139,6 +191,9 @@ func BuildCommandWithPrompt(cliPath string, opts *CommandOptions, prompt string)
 	if opts.Model != nil {
 		cmd = append(cmd, "--model", *opts.Model)
 	}
+	if opts.FallbackModel != nil {
+		cmd = append(cmd, "--fallback-model", *opts.FallbackModel)
+	}
 	if opts.PermissionMode != nil {
 		cmd = append(cmd, "--permission-mode", string(*opts.PermissionMode))
 	}
@@ -147,6 +202,15 @@ func BuildCommandWithPrompt(cliPath string, opts *CommandOptions, prompt string)
 	}
 	if opts.Resume != nil {
 		cmd = append(cmd, "--resume", *opts.Resume)
+	}
+	if opts.ResumeSessionAt != nil {
+		cmd = append(cmd, "--resume-at", *opts.ResumeSessionAt)
+	}
+	if opts.ForkSession {
+		cmd = append(cmd, "--fork-session")
+	}
+	if opts.PersistSession != nil && !*opts.PersistSession {
+		cmd = append(cmd, "--no-persist")
 	}
 	if opts.MaxTurns != nil {
 		cmd = append(cmd, "--max-turns", fmt.Sprintf("%d", *opts.MaxTurns))
@@ -157,11 +221,40 @@ func BuildCommandWithPrompt(cliPath string, opts *CommandOptions, prompt string)
 	for _, dir := range opts.AdditionalDirectories {
 		cmd = append(cmd, "--add-dir", dir)
 	}
+	if opts.StrictMcpConfig {
+		cmd = append(cmd, "--strict-mcp-config")
+	}
+	if opts.Agent != nil {
+		cmd = append(cmd, "--agent", *opts.Agent)
+	}
+	if opts.EnableFileCheckpointing {
+		cmd = append(cmd, "--enable-file-checkpointing")
+	}
 	if opts.AllowDangerouslySkipPermissions {
 		cmd = append(cmd, "--dangerously-skip-permissions")
 	}
 	if opts.IncludePartialMessages {
 		cmd = append(cmd, "--include-partial-messages")
+	}
+	if opts.Tools != nil {
+		if data, err := json.Marshal(opts.Tools); err == nil {
+			cmd = append(cmd, "--tools", string(data))
+		}
+	}
+	if opts.Sandbox != nil {
+		if data, err := json.Marshal(opts.Sandbox); err == nil {
+			cmd = append(cmd, "--sandbox", string(data))
+		}
+	}
+	if opts.Plugins != nil {
+		if data, err := json.Marshal(opts.Plugins); err == nil {
+			cmd = append(cmd, "--plugins", string(data))
+		}
+	}
+	if opts.OutputFormat != nil {
+		if data, err := json.Marshal(opts.OutputFormat); err == nil {
+			cmd = append(cmd, "--output-format-config", string(data))
+		}
 	}
 
 	for flag, value := range opts.ExtraArgs {

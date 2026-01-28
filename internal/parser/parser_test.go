@@ -3,7 +3,7 @@ package parser
 import (
 	"testing"
 
-	"claudecode/message"
+	"claudeagent/message"
 )
 
 func TestParser_ProcessLine_ValidUserMessage(t *testing.T) {

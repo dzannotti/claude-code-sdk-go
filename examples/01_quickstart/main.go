@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"claudecode"
+	"claudeagent"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 
 	ctx := context.Background()
 
-	iterator, err := claudecode.Query(ctx, "What is 2+2?")
+	iterator, err := claudeagent.Query(ctx, "What is 2+2?")
 	if err != nil {
 		log.Fatalf("Query failed: %v", err)
 	}
@@ -27,20 +27,20 @@ func main() {
 	for {
 		message, err := iterator.Next(ctx)
 		if err != nil {
-			if errors.Is(err, claudecode.ErrDone) {
+			if errors.Is(err, claudeagent.ErrDone) {
 				break
 			}
 			log.Fatalf("Failed to get message: %v", err)
 		}
 
 		switch msg := message.(type) {
-		case *claudecode.AssistantMessage:
+		case *claudeagent.AssistantMessage:
 			for _, block := range msg.Message.Content {
-				if textBlock, ok := block.(*claudecode.TextBlock); ok {
+				if textBlock, ok := block.(*claudeagent.TextBlock); ok {
 					fmt.Print(textBlock.Text)
 				}
 			}
-		case *claudecode.ResultMessage:
+		case *claudeagent.ResultMessage:
 			if msg.IsError {
 				log.Printf("Error: %s", msg.Result)
 			}

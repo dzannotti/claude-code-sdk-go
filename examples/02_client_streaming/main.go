@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"claudecode"
+	"claudeagent"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 	ctx := context.Background()
 	question := "Explain what Go goroutines are and show a simple example"
 
-	err := claudecode.WithClient(ctx, func(client claudecode.Client) error {
+	err := claudeagent.WithClient(ctx, func(client claudeagent.Client) error {
 		fmt.Println("\nConnected! Streaming response:")
 
 		if err := client.Query(ctx, question); err != nil {
@@ -32,13 +32,13 @@ func main() {
 				}
 
 				switch m := msg.(type) {
-				case *claudecode.AssistantMessage:
+				case *claudeagent.AssistantMessage:
 					for _, block := range m.Message.Content {
-						if textBlock, ok := block.(*claudecode.TextBlock); ok {
+						if textBlock, ok := block.(*claudeagent.TextBlock); ok {
 							fmt.Print(textBlock.Text)
 						}
 					}
-				case *claudecode.ResultMessage:
+				case *claudeagent.ResultMessage:
 					if m.IsError {
 						return fmt.Errorf("error: %s", m.Result)
 					}

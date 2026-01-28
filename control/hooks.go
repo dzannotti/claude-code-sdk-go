@@ -17,6 +17,7 @@ const (
 	HookSubagentStop       HookEvent = "SubagentStop"
 	HookPreCompact         HookEvent = "PreCompact"
 	HookPermissionRequest  HookEvent = "PermissionRequest"
+	HookSetup              HookEvent = "Setup"
 )
 
 type HookCallback func(
@@ -95,8 +96,10 @@ func (h *UserPromptSubmitHookInput) HookEventName() HookEvent { return HookUserP
 
 type SessionStartHookInput struct {
 	BaseHookInput
-	HookEvent string `json:"hook_event_name"`
-	Source    string `json:"source"`
+	HookEvent string  `json:"hook_event_name"`
+	Source    string  `json:"source"`
+	AgentType *string `json:"agent_type,omitempty"`
+	Model     *string `json:"model,omitempty"`
 }
 
 func (h *SessionStartHookInput) HookEventName() HookEvent { return HookSessionStart }
@@ -154,6 +157,14 @@ type PermissionRequestHookInput struct {
 }
 
 func (h *PermissionRequestHookInput) HookEventName() HookEvent { return HookPermissionRequest }
+
+type SetupHookInput struct {
+	BaseHookInput
+	HookEvent string `json:"hook_event_name"`
+	Trigger   string `json:"trigger"`
+}
+
+func (h *SetupHookInput) HookEventName() HookEvent { return HookSetup }
 
 type HookOutput struct {
 	Async              bool   `json:"async,omitempty"`

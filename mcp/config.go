@@ -28,3 +28,11 @@ type HTTPServerConfig struct {
 }
 
 func (HTTPServerConfig) serverConfig() {}
+
+type ClaudeAIProxyServerConfig struct {
+	Type string `json:"type"`
+	URL  string `json:"url"`
+	ID   string `json:"id"`
+}
+
+func (ClaudeAIProxyServerConfig) serverConfig() {}

@@ -110,6 +110,62 @@ func ParseMessage(data []byte) (Message, error) {
 		}
 		return &msg, nil
 
+	case "user_message_replay":
+		var msg UserMessageReplay
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil, fmt.Errorf("failed to parse user message replay: %w", err)
+		}
+		return &msg, nil
+
+	case "compact_boundary":
+		var msg CompactBoundaryMessage
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil, fmt.Errorf("failed to parse compact boundary message: %w", err)
+		}
+		return &msg, nil
+
+	case "status":
+		var msg StatusMessage
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil, fmt.Errorf("failed to parse status message: %w", err)
+		}
+		return &msg, nil
+
+	case "hook_started":
+		var msg HookStartedMessage
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil, fmt.Errorf("failed to parse hook started message: %w", err)
+		}
+		return &msg, nil
+
+	case "hook_progress":
+		var msg HookProgressMessage
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil, fmt.Errorf("failed to parse hook progress message: %w", err)
+		}
+		return &msg, nil
+
+	case "hook_response":
+		var msg HookResponseMessage
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil, fmt.Errorf("failed to parse hook response message: %w", err)
+		}
+		return &msg, nil
+
+	case "task_notification":
+		var msg TaskNotificationMessage
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil, fmt.Errorf("failed to parse task notification message: %w", err)
+		}
+		return &msg, nil
+
+	case "tool_use_summary":
+		var msg ToolUseSummaryMessage
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return nil, fmt.Errorf("failed to parse tool use summary message: %w", err)
+		}
+		return &msg, nil
+
 	default:
 		// Unknown message types - parse as raw to avoid breaking on new CLI message types
 		var raw map[string]any

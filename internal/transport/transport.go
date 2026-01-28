@@ -3,7 +3,7 @@ package transport
 import (
 	"context"
 
-	"claudecode/message"
+	"claudeagent/message"
 )
 
 type StreamMessage struct {

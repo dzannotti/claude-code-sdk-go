@@ -42,7 +42,7 @@ type PermissionResult struct {
 	UpdatedPermissions []PermissionUpdate
 	Message            string
 	Interrupt          bool
-	ToolUseID          string
+	ToolUseID          *string
 }
 
 type PermissionUpdate struct {

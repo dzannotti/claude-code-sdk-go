@@ -1,9 +1,9 @@
-package claudecode
+package claudeagent
 
 import (
-	"claudecode/control"
-	"claudecode/mcp"
-	"claudecode/message"
+	"claudeagent/control"
+	"claudeagent/mcp"
+	"claudeagent/message"
 )
 
 type Message = message.Message
@@ -14,6 +14,15 @@ type SystemMessage = message.SystemMessage
 type StreamEvent = message.StreamEvent
 type ToolProgressMessage = message.ToolProgressMessage
 type AuthStatusMessage = message.AuthStatusMessage
+type UserMessageReplay = message.UserMessageReplay
+type CompactBoundaryMessage = message.CompactBoundaryMessage
+type StatusMessage = message.StatusMessage
+type HookStartedMessage = message.HookStartedMessage
+type HookProgressMessage = message.HookProgressMessage
+type HookResponseMessage = message.HookResponseMessage
+type TaskNotificationMessage = message.TaskNotificationMessage
+type ToolUseSummaryMessage = message.ToolUseSummaryMessage
+type RawMessage = message.RawMessage
 
 type ContentBlock = message.ContentBlock
 type TextBlock = message.TextBlock
@@ -42,8 +51,19 @@ type McpServerConfig = mcp.ServerConfig
 type McpStdioServerConfig = mcp.StdioServerConfig
 type McpSSEServerConfig = mcp.SSEServerConfig
 type McpHTTPServerConfig = mcp.HTTPServerConfig
+type McpSdkServerConfig = mcp.SdkServerConfig
+type McpClaudeAIProxyServerConfig = mcp.ClaudeAIProxyServerConfig
 type McpServerStatus = mcp.ServerStatus
 type McpSetServersResult = mcp.SetServersResult
+type McpServerInfo = mcp.ServerInfo
+type McpServerStatusConfig = mcp.ServerStatusConfig
+type McpToolInfo = mcp.ToolInfo
+type McpToolAnnotations = mcp.ToolAnnotations
+type McpServer = mcp.McpServer
+type McpToolDefinition = mcp.ToolDefinition
+type McpToolResult = mcp.ToolResult
+type McpToolResultContent = mcp.ToolResultContent
+type SdkMcpServer = mcp.SdkMcpServer
 
 const (
 	PermissionModeDefault           = control.PermissionModeDefault
@@ -69,6 +89,7 @@ const (
 	HookSubagentStop       = control.HookSubagentStop
 	HookPreCompact         = control.HookPreCompact
 	HookPermissionRequest  = control.HookPermissionRequest
+	HookSetup              = control.HookSetup
 )
 
 type SlashCommand struct {

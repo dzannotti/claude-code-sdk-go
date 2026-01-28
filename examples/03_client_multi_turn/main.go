@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"claudecode"
+	"claudeagent"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func main() {
 		"How would I implement a search function for the same tree?",
 	}
 
-	err := claudecode.WithClient(ctx, func(client claudecode.Client) error {
+	err := claudeagent.WithClient(ctx, func(client claudeagent.Client) error {
 		fmt.Println("\nConnected! Starting conversation...")
 
 		for i, question := range questions {
@@ -47,7 +47,7 @@ func main() {
 	}
 }
 
-func streamFullResponse(ctx context.Context, client claudecode.Client) error {
+func streamFullResponse(ctx context.Context, client claudeagent.Client) error {
 	msgChan := client.Messages(ctx)
 	for {
 		select {
@@ -57,13 +57,13 @@ func streamFullResponse(ctx context.Context, client claudecode.Client) error {
 			}
 
 			switch m := msg.(type) {
-			case *claudecode.AssistantMessage:
+			case *claudeagent.AssistantMessage:
 				for _, block := range m.Message.Content {
-					if textBlock, ok := block.(*claudecode.TextBlock); ok {
+					if textBlock, ok := block.(*claudeagent.TextBlock); ok {
 						fmt.Print(textBlock.Text)
 					}
 				}
-			case *claudecode.ResultMessage:
+			case *claudeagent.ResultMessage:
 				if m.IsError {
 					return fmt.Errorf("error: %s", m.Result)
 				}

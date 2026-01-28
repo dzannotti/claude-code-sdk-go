@@ -1,12 +1,12 @@
-package claudecode
+package claudeagent
 
 import (
 	"context"
 	"fmt"
 
-	"claudecode/internal/cli"
-	"claudecode/internal/transport"
-	"claudecode/message"
+	"claudeagent/internal/cli"
+	"claudeagent/internal/transport"
+	"claudeagent/message"
 )
 
 func Query(ctx context.Context, prompt string, opts ...Option) (MessageIterator, error) {
@@ -77,16 +77,24 @@ func buildCommandOptions(options *Options) *cli.CommandOptions {
 		DisallowedTools:                 options.DisallowedTools,
 		Continue:                        options.Continue,
 		Resume:                          options.Resume,
+		ResumeSessionAt:                 options.ResumeSessionAt,
+		ForkSession:                     options.ForkSession,
+		PersistSession:                  options.PersistSession,
 		MaxTurns:                        options.MaxTurns,
 		MaxBudgetUSD:                    options.MaxBudgetUSD,
 		Cwd:                             options.Cwd,
 		AdditionalDirectories:           options.AdditionalDirectories,
+		McpServers:                      options.McpServers,
+		StrictMcpConfig:                 options.StrictMcpConfig,
+		Agent:                           options.Agent,
+		EnableFileCheckpointing:         options.EnableFileCheckpointing,
 		Betas:                           options.Betas,
 		ExtraArgs:                       options.ExtraArgs,
 		SettingSources:                  options.SettingSources,
 		AllowDangerouslySkipPermissions: options.AllowDangerouslySkipPermissions,
 		IncludePartialMessages:          options.IncludePartialMessages,
 		Model:                           options.Model,
+		FallbackModel:                   options.FallbackModel,
 		MaxThinkingTokens:               options.MaxThinkingTokens,
 		PermissionMode:                  options.PermissionMode,
 		PermissionPromptToolName:        options.PermissionPromptToolName,
@@ -105,6 +113,19 @@ func buildCommandOptions(options *Options) *cli.CommandOptions {
 		if options.SystemPrompt.Append != "" {
 			cmdOpts.AppendSystemPrompt = &options.SystemPrompt.Append
 		}
+	}
+
+	if options.Tools != nil {
+		cmdOpts.Tools = options.Tools
+	}
+	if options.Sandbox != nil {
+		cmdOpts.Sandbox = options.Sandbox
+	}
+	if options.Plugins != nil {
+		cmdOpts.Plugins = options.Plugins
+	}
+	if options.OutputFormat != nil {
+		cmdOpts.OutputFormat = options.OutputFormat
 	}
 
 	return cmdOpts

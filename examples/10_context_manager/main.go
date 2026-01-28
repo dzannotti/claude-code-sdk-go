@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"claudecode"
+	"claudeagent"
 )
 
 func main() {
@@ -43,7 +43,7 @@ func main() {
 func demonstrateWithClient(ctx context.Context, question string) error {
 	fmt.Println("Using WithClient for automatic resource management...")
 
-	return claudecode.WithClient(ctx, func(client claudecode.Client) error {
+	return claudeagent.WithClient(ctx, func(client claudeagent.Client) error {
 		fmt.Println("Connected! Client managed automatically")
 
 		if err := client.Query(ctx, question); err != nil {
@@ -62,7 +62,7 @@ func demonstrateWithClient(ctx context.Context, question string) error {
 func demonstrateManualPattern(ctx context.Context, question string) error {
 	fmt.Println("Using manual Connect/Disconnect pattern...")
 
-	client, err := claudecode.NewClient()
+	client, err := claudeagent.NewClient()
 	if err != nil {
 		return fmt.Errorf("create client failed: %w", err)
 	}
@@ -98,14 +98,14 @@ func demonstrateErrorScenarios(ctx context.Context) error {
 	cancelCtx, cancel := context.WithCancel(ctx)
 	cancel()
 
-	err := claudecode.WithClient(cancelCtx, func(client claudecode.Client) error {
+	err := claudeagent.WithClient(cancelCtx, func(client claudeagent.Client) error {
 		return client.Query(cancelCtx, "This will be cancelled")
 	})
 	if err != nil {
 		fmt.Printf("WithClient handled cancellation: %v\n", err)
 	}
 
-	err = claudecode.WithClient(ctx, func(client claudecode.Client) error {
+	err = claudeagent.WithClient(ctx, func(client claudeagent.Client) error {
 		return fmt.Errorf("simulated application error")
 	})
 	if err != nil {
@@ -116,7 +116,7 @@ func demonstrateErrorScenarios(ctx context.Context) error {
 	return nil
 }
 
-func showFirstLines(ctx context.Context, client claudecode.Client, maxLines, maxWidth int) error {
+func showFirstLines(ctx context.Context, client claudeagent.Client, maxLines, maxWidth int) error {
 	msgChan := client.Messages(ctx)
 	linesShown := 0
 
@@ -128,9 +128,9 @@ func showFirstLines(ctx context.Context, client claudecode.Client, maxLines, max
 			}
 
 			switch m := msg.(type) {
-			case *claudecode.AssistantMessage:
+			case *claudeagent.AssistantMessage:
 				for _, block := range m.Message.Content {
-					if textBlock, ok := block.(*claudecode.TextBlock); ok {
+					if textBlock, ok := block.(*claudeagent.TextBlock); ok {
 						if linesShown < maxLines {
 							text := textBlock.Text
 							if len(text) > maxWidth {
@@ -141,7 +141,7 @@ func showFirstLines(ctx context.Context, client claudecode.Client, maxLines, max
 						}
 					}
 				}
-			case *claudecode.ResultMessage:
+			case *claudeagent.ResultMessage:
 				if m.IsError {
 					return fmt.Errorf("error: %s", m.Result)
 				}
@@ -156,7 +156,7 @@ func showFirstLines(ctx context.Context, client claudecode.Client, maxLines, max
 	return nil
 }
 
-func drainMessages(msgChan <-chan claudecode.Message) {
+func drainMessages(msgChan <-chan claudeagent.Message) {
 	for {
 		select {
 		case msg := <-msgChan:

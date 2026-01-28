@@ -238,3 +238,149 @@ func TestParseMessage_InvalidJSON(t *testing.T) {
 		t.Fatal("expected error for invalid JSON")
 	}
 }
+
+func TestParseMessage_UserMessageReplay(t *testing.T) {
+	data := []byte(`{
+		"type": "user_message_replay",
+		"message": {"role": "user", "content": "Previous message"},
+		"uuid": "replay-1",
+		"session_id": "session-1"
+	}`)
+
+	msg, err := ParseMessage(data)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	replay, ok := msg.(*UserMessageReplay)
+	if !ok {
+		t.Fatalf("expected *UserMessageReplay, got %T", msg)
+	}
+
+	if replay.MessageType() != "user_message_replay" {
+		t.Errorf("expected type 'user_message_replay', got %q", replay.MessageType())
+	}
+}
+
+func TestParseMessage_CompactBoundary(t *testing.T) {
+	data := []byte(`{
+		"type": "compact_boundary",
+		"subtype": "start",
+		"uuid": "compact-1",
+		"session_id": "session-1"
+	}`)
+
+	msg, err := ParseMessage(data)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	compact, ok := msg.(*CompactBoundaryMessage)
+	if !ok {
+		t.Fatalf("expected *CompactBoundaryMessage, got %T", msg)
+	}
+
+	if compact.Subtype != "start" {
+		t.Errorf("expected subtype 'start', got %q", compact.Subtype)
+	}
+}
+
+func TestParseMessage_Status(t *testing.T) {
+	data := []byte(`{
+		"type": "status",
+		"status": "running",
+		"message": "Processing...",
+		"uuid": "status-1",
+		"session_id": "session-1"
+	}`)
+
+	msg, err := ParseMessage(data)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	status, ok := msg.(*StatusMessage)
+	if !ok {
+		t.Fatalf("expected *StatusMessage, got %T", msg)
+	}
+
+	if status.Status != "running" {
+		t.Errorf("expected status 'running', got %q", status.Status)
+	}
+}
+
+func TestParseMessage_HookStarted(t *testing.T) {
+	data := []byte(`{
+		"type": "hook_started",
+		"hook_name": "pre_tool",
+		"hook_event": "PreToolUse",
+		"tool_name": "Bash",
+		"callback_id": "cb-1",
+		"uuid": "hook-1",
+		"session_id": "session-1"
+	}`)
+
+	msg, err := ParseMessage(data)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	hook, ok := msg.(*HookStartedMessage)
+	if !ok {
+		t.Fatalf("expected *HookStartedMessage, got %T", msg)
+	}
+
+	if hook.HookEvent != "PreToolUse" {
+		t.Errorf("expected hook_event 'PreToolUse', got %q", hook.HookEvent)
+	}
+}
+
+func TestParseMessage_TaskNotification(t *testing.T) {
+	data := []byte(`{
+		"type": "task_notification",
+		"task_id": "task-123",
+		"task_status": "completed",
+		"message": "Task finished",
+		"uuid": "task-notif-1",
+		"session_id": "session-1"
+	}`)
+
+	msg, err := ParseMessage(data)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	task, ok := msg.(*TaskNotificationMessage)
+	if !ok {
+		t.Fatalf("expected *TaskNotificationMessage, got %T", msg)
+	}
+
+	if task.TaskID != "task-123" {
+		t.Errorf("expected task_id 'task-123', got %q", task.TaskID)
+	}
+}
+
+func TestParseMessage_ToolUseSummary(t *testing.T) {
+	data := []byte(`{
+		"type": "tool_use_summary",
+		"tool_use_id": "tool-1",
+		"tool_name": "Read",
+		"summary": "Read 10 files",
+		"uuid": "summary-1",
+		"session_id": "session-1"
+	}`)
+
+	msg, err := ParseMessage(data)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	summary, ok := msg.(*ToolUseSummaryMessage)
+	if !ok {
+		t.Fatalf("expected *ToolUseSummaryMessage, got %T", msg)
+	}
+
+	if summary.Summary != "Read 10 files" {
+		t.Errorf("expected summary 'Read 10 files', got %q", summary.Summary)
+	}
+}

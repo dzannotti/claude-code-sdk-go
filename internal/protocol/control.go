@@ -7,8 +7,8 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"claudecode/control"
-	"claudecode/mcp"
+	"claudeagent/control"
+	"claudeagent/mcp"
 )
 
 type ControlRequest struct {
@@ -340,6 +340,66 @@ func (h *ControlHandler) SetMaxThinkingTokens(ctx context.Context, tokens *int) 
 func (h *ControlHandler) RewindFiles(ctx context.Context, userMessageID string) error {
 	_, err := h.SendRequest(ctx, "rewind_files", map[string]any{
 		"user_message_id": userMessageID,
+	})
+	return err
+}
+
+type RewindFilesResult struct {
+	CanRewind    bool     `json:"canRewind"`
+	Error        *string  `json:"error,omitempty"`
+	FilesChanged []string `json:"filesChanged,omitempty"`
+	Insertions   *int     `json:"insertions,omitempty"`
+	Deletions    *int     `json:"deletions,omitempty"`
+}
+
+func (h *ControlHandler) RewindFilesWithOptions(ctx context.Context, userMessageID string, dryRun bool) (*RewindFilesResult, error) {
+	payload := map[string]any{
+		"user_message_id": userMessageID,
+	}
+	if dryRun {
+		payload["dry_run"] = true
+	}
+	resp, err := h.SendRequest(ctx, "rewind_files", payload)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &RewindFilesResult{}
+	if canRewind, ok := resp.Response["canRewind"].(bool); ok {
+		result.CanRewind = canRewind
+	}
+	if errStr, ok := resp.Response["error"].(string); ok {
+		result.Error = &errStr
+	}
+	if files, ok := resp.Response["filesChanged"].([]any); ok {
+		for _, f := range files {
+			if s, ok := f.(string); ok {
+				result.FilesChanged = append(result.FilesChanged, s)
+			}
+		}
+	}
+	if insertions, ok := resp.Response["insertions"].(float64); ok {
+		i := int(insertions)
+		result.Insertions = &i
+	}
+	if deletions, ok := resp.Response["deletions"].(float64); ok {
+		d := int(deletions)
+		result.Deletions = &d
+	}
+	return result, nil
+}
+
+func (h *ControlHandler) ReconnectMcpServer(ctx context.Context, serverName string) error {
+	_, err := h.SendRequest(ctx, "mcp_reconnect", map[string]any{
+		"server_name": serverName,
+	})
+	return err
+}
+
+func (h *ControlHandler) ToggleMcpServer(ctx context.Context, serverName string, enabled bool) error {
+	_, err := h.SendRequest(ctx, "mcp_toggle", map[string]any{
+		"server_name": serverName,
+		"enabled":     enabled,
 	})
 	return err
 }

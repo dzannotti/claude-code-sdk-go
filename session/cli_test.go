@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"claudecode/message"
+	"claudeagent/message"
 )
 
 func TestLoad(t *testing.T) {

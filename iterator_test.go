@@ -1,4 +1,4 @@
-package claudecode
+package claudeagent
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"claudecode/message"
+	"claudeagent/message"
 )
 
 func TestChannelIterator_Next_Success(t *testing.T) {

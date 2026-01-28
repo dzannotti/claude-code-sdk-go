@@ -1,3 +1,3 @@
-module claudecode
+module claudeagent
 
 go 1.21

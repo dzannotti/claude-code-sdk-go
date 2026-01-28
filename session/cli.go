@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"claudecode/message"
+	"claudeagent/message"
 )
 
 type Info struct {

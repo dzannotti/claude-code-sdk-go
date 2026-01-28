@@ -1,10 +1,10 @@
-package claudecode
+package claudeagent
 
 import (
 	"context"
 	"sync"
 
-	"claudecode/message"
+	"claudeagent/message"
 )
 
 type MessageIterator interface {
