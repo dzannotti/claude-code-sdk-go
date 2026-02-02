@@ -3,7 +3,7 @@ package parser
 import (
 	"testing"
 
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 func TestParser_ProcessLine_ValidUserMessage(t *testing.T) {

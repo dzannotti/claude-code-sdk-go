@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	"claudeagent/control"
-	"claudeagent/internal/transport"
-	"claudeagent/mcp"
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/control"
+	"github.com/dzannotti/claude-code-sdk-go/internal/transport"
+	"github.com/dzannotti/claude-code-sdk-go/mcp"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 type Client interface {

@@ -1,7 +1,7 @@
 package claudeagent
 
 import (
-	"claudeagent/internal/cli"
+	"github.com/dzannotti/claude-code-sdk-go/internal/cli"
 )
 
 func FindCLI() (string, error) {

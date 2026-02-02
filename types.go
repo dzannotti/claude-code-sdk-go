@@ -1,9 +1,9 @@
 package claudeagent
 
 import (
-	"claudeagent/control"
-	"claudeagent/mcp"
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/control"
+	"github.com/dzannotti/claude-code-sdk-go/mcp"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 type Message = message.Message

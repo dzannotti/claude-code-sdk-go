@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"claudeagent"
+	"github.com/dzannotti/claude-code-sdk-go"
 )
 
 func main() {

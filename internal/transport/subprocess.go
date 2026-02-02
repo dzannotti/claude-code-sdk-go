@@ -14,10 +14,10 @@ import (
 	"syscall"
 	"time"
 
-	"claudeagent/internal/cli"
-	"claudeagent/internal/parser"
-	"claudeagent/internal/protocol"
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/internal/cli"
+	"github.com/dzannotti/claude-code-sdk-go/internal/parser"
+	"github.com/dzannotti/claude-code-sdk-go/internal/protocol"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 const (

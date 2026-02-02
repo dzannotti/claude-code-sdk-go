@@ -10,9 +10,9 @@ import (
 	"log"
 	"os"
 
-	"claudeagent"
-	"claudeagent/message"
-	"claudeagent/session"
+	"github.com/dzannotti/claude-code-sdk-go"
+	"github.com/dzannotti/claude-code-sdk-go/message"
+	"github.com/dzannotti/claude-code-sdk-go/session"
 )
 
 func main() {

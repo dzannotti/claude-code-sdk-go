@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"claudeagent"
+	"github.com/dzannotti/claude-code-sdk-go"
 )
 
 var debugLog *os.File

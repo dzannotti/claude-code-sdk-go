@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"io"
 
-	"claudeagent/control"
-	"claudeagent/mcp"
+	"github.com/dzannotti/claude-code-sdk-go/control"
+	"github.com/dzannotti/claude-code-sdk-go/mcp"
 )
 
 type Options struct {

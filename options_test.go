@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"claudeagent/control"
-	"claudeagent/mcp"
+	"github.com/dzannotti/claude-code-sdk-go/control"
+	"github.com/dzannotti/claude-code-sdk-go/mcp"
 )
 
 func TestWithModel(t *testing.T) {

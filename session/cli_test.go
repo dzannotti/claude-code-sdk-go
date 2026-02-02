@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 func TestLoad(t *testing.T) {

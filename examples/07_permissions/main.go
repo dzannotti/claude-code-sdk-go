@@ -9,8 +9,8 @@ import (
 	"log"
 	"strings"
 
-	"claudeagent"
-	"claudeagent/control"
+	"github.com/dzannotti/claude-code-sdk-go"
+	"github.com/dzannotti/claude-code-sdk-go/control"
 )
 
 func main() {

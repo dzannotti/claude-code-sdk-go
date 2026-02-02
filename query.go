@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"claudeagent/internal/cli"
-	"claudeagent/internal/transport"
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/internal/cli"
+	"github.com/dzannotti/claude-code-sdk-go/internal/transport"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 func Query(ctx context.Context, prompt string, opts ...Option) (MessageIterator, error) {

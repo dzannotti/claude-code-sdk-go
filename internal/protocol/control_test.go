@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"claudeagent/control"
-	"claudeagent/mcp"
+	"github.com/dzannotti/claude-code-sdk-go/control"
+	"github.com/dzannotti/claude-code-sdk-go/mcp"
 )
 
 type mockSender struct {

@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"log"
 
-	"claudeagent"
-	"claudeagent/mcp"
+	"github.com/dzannotti/claude-code-sdk-go"
+	"github.com/dzannotti/claude-code-sdk-go/mcp"
 )
 
 func main() {

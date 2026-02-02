@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 type Info struct {

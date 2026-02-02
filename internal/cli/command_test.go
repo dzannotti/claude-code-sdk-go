@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"claudeagent/control"
+	"github.com/dzannotti/claude-code-sdk-go/control"
 )
 
 func TestBuildCommand_Basic(t *testing.T) {

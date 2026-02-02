@@ -3,7 +3,7 @@ package transport
 import (
 	"context"
 
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 type StreamMessage struct {

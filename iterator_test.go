@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 func TestChannelIterator_Next_Success(t *testing.T) {

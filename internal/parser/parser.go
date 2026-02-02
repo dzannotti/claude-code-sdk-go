@@ -3,7 +3,7 @@ package parser
 import (
 	"fmt"
 
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 const maxBufferSize = 1 << 20 // 1MB

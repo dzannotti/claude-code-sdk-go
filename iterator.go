@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"claudeagent/message"
+	"github.com/dzannotti/claude-code-sdk-go/message"
 )
 
 type MessageIterator interface {
